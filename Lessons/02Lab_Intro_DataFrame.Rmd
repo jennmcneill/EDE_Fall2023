@@ -4,6 +4,8 @@ subtitle: "Environmental Data Analytics"
 author: "Jenn McNeill"
 date: "Fall 2023"
 output: pdf_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -29,9 +31,10 @@ Note that it has 2 columns and 50 rows.
 ## Data frame columns
 
 Suppose you want just the column speed. How would you access that data?
-
+## you can pull out a specific column using the $ command
 ```{r}
 cars$speed
+mtcars$cyl
 ```
 
 How would you store it on another object?
@@ -108,11 +111,16 @@ nrow(df)
 length(df)  #same as ncol
 summary(df)
 head(df) #show the first 6 rows of df
+head(df,2) #show the first 2 rows or any other number you want
 
 #If you know the number of the column you want you can refer to that to access column
 df[,1]
+df[1:10,2] #column 2 for everything rows 1 through 10
+df[c(1,2,3),2] #vector for column 2 rows 1 2 and 3. c() means combine. you could choose a diff order if you wanted
+df[c(2,3,1),2] #different order shown here
 
 #you could also use this notation to delete columns
 df <- df[,-2]
 df
+
 ```
