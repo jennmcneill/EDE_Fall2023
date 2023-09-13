@@ -75,6 +75,7 @@ student_passes <- as.data.frame(cbind(names, scores, pass))
 
 #8.
 colnames(student_passes) <- c('Student Name', 'Score Received', 'Pass or Fail')
+student_passes
 ```
 
 9.  QUESTION: How is this data frame different from a matrix?
