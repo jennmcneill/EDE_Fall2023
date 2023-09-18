@@ -1,3 +1,8 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
 ## Lesson Objectives
 1. Set up a data analysis session in RStudio
 2. Import and explore datasets in R
@@ -51,15 +56,15 @@ If a package is already installed, you will need to load it every session. You c
 
 ```{r Installing and loading packages}
 # We will use the packages dplyr and ggplot2 regularly. 
-#install.packages("dplyr") 
-#install.packages("ggplot2")
+install.packages("dplyr") 
+install.packages("ggplot2")
 # comment out install commands, use only when needed and re-comment
 
 library(dplyr)
 library(ggplot2)
 
 # Some packages are umbrellas under which other packages are loaded
-#install.packages("tidyverse")
+install.packages("tidyverse")
 library(tidyverse)
 ```
 
@@ -93,7 +98,7 @@ USGS.flow.data <- read.csv("./Data/Raw/USGS_Site02085000_Flow_Raw.csv",stringsAs
 #read.csv("./Data/Raw/USGS_Site02085000_Flow_Raw.csv",stringsAsFactors = TRUE)
 
 # Another option is to choose with your browser
-# read.csv(file.choose(),stringsAsFactors = TRUE)
+#read.csv(file.choose(),stringsAsFactors = TRUE)
 
 # To import .txt files, use read.table rather than read.csv
 #read.table()
@@ -114,6 +119,7 @@ class(USGS.flow.data)
 colnames(USGS.flow.data)
 
 # Rename columns
+# c() is short for cbind which is short for column bind command
 colnames(USGS.flow.data) <- c("agency_cd", "site_no", "datetime", 
                               "discharge.max", "discharge.max.approval", 
                               "discharge.min", "discharge.min.approval", 
@@ -121,7 +127,9 @@ colnames(USGS.flow.data) <- c("agency_cd", "site_no", "datetime",
                               "gage.height.max", "gage.height.max.approval", 
                               "gage.height.min", "gage.height.min.approval", 
                               "gage.height.mean", "gage.height.mean.approval")
+#shows all objects on data frame
 str(USGS.flow.data)
+#tells how many rows and columns you have on your data set
 dim(USGS.flow.data)
 length(USGS.flow.data)
 
@@ -134,12 +142,12 @@ class(USGS.flow.data$datetime)
 class(USGS.flow.data$discharge.mean)
 class(USGS.flow.data$gage.height.mean)
 
-summary(USGS.flow.data)  #could point to column only with $
+summary(USGS.flow.data$discharge.max)  #could point to column only with $
 
 ```
 
 What happened to blank cells in the spreadsheet when they were imported into R?
-> Answer: 
+> Answer: imported as NA in R
 
 ## Adjusting Datasets
 
@@ -153,9 +161,9 @@ summary(USGS.flow.data$gage.height.mean)
 ```
 Question: What types of research questions might make it favorable to remove NAs from a dataset, and what types of research questions might make it favorable to retain NAs in the dataset?
 
-> Answer: 
+> Answer: never remove NAs for a time series analysis because then you don't have a complete picture of your data. you can often omit NAs if they're all together at the beginning. if you want the mean and standard deviation then it might make sense to remove NAs because they could alter your data if left in.
 
-```{r Removing NAs}
+```{r Removing NAs} 
 USGS.flow.data.complete <- na.omit(USGS.flow.data)
 dim(USGS.flow.data)
 dim(USGS.flow.data.complete)
@@ -171,7 +179,7 @@ summary(USGS.flow.data.complete$discharge.mean)
 R will often import dates as factors or characters rather than dates. To fix, this we need to tell R that it is looking at dates. We also need to specify the format the dates are in. By default, if you don't provide a format, R will attempt to use %Y-%m-%d or %Y/%m/%d as a default. Note: if you are working collaboratively in an international setting, using a year-month-day format in spreadsheets is the least ambiguous of date formats. Make sure to check whether month-day-year or day-month-year is used in an ambiguously formatted spreadsheet.
 
 Formatting of dates in R: 
-
+# the % operator is usually used to format as a variable
 %d  day as number (0-31)
 %m  month (00-12, can be e.g., 01 or 1)
 %y  2-digit year
@@ -196,23 +204,24 @@ format(today, format = "%B")
 #format(today, format = "")
 #format(today, format = "")
 
+#we are teaching R how to transform our current "dates" into actual dates
 USGS.flow.data$datetime <- as.Date(USGS.flow.data$datetime, format = "%m/%d/%y") 
 ```
 
 Note that for every date prior to 1969, R has assigned the date in the 2000s rather than the 1900s. This can be fixed with an `ifelse` statement inside a function. Run through the code below and write what is happening in the comment above each line.
 
 ```{r Fixing dates}
-# 
+# convert the date object back into a character object
 USGS.flow.data$datetime <- format(USGS.flow.data$datetime, "%y%m%d")
 
-#
+# we are concatonating strings. gluing the 19 or 20 to the d input (whatever is assigned in the daytime column) depending on the result of the if statement
 create.early.dates <- (function(d) {
        paste0(ifelse(d > 191226,"19","20"),d)
        })
-#
+# add the 19 to the initial observations
 USGS.flow.data$datetime <- create.early.dates(USGS.flow.data$datetime)
 
-#
+# convert back to a date from a character object. using %Y because we are using a 4 digit year
 USGS.flow.data$datetime <- as.Date(USGS.flow.data$datetime, format = "%Y%m%d") 
 
 ```
