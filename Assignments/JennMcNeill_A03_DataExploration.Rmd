@@ -84,7 +84,8 @@ summary(Neonics$Effect)
 # create a variable to store the summary of the effect column
 common_effects <- sort(summary(Neonics$Effect))
 
-# print the effects in sorted order to discern that mortality and population are the most common effects
+# print the effects in sorted order to discern that mortality and population 
+# are the most common effects
 common_effects
 
 ```
@@ -99,10 +100,12 @@ common_effects
 # create a variable to store the sorted summary of the species common name column
 commonly_studied <- sort(summary(Neonics$Species.Common.Name))
 
-# find the length of the species common name column to determine where the "top six" will fall
+# find the length of the species common name column 
+# to determine where the "top six" will fall
 length(summary(Neonics$Species.Common.Name))
 
-# create a variable to store the values for the last six values in the variable commonly_studied
+# create a variable to store the values for the last six values 
+# in the variable commonly_studied
 top_six <- commonly_studied[95:100]
 
 # print the top six species
@@ -136,7 +139,8 @@ class(Neonics$Conc.1..Author.)
 
 ```{r Plot the Studies Conducted by Publication Year}
 
-# set the aesthetics of the geom_freqpoly function to display Publication Year on the x-axis
+# set the aesthetics of the geom_freqpoly function to display 
+# Publication Year on the x-axis
 ggplot(Neonics) +
   geom_freqpoly(aes(x = Publication.Year))
 
@@ -146,7 +150,8 @@ ggplot(Neonics) +
 
 ```{r Display Different Test Locations as Different Colors}
 
-# add 'color =' to the aesthetics of the plot so that each test location displays as a different line in a different color
+# add 'color =' to the aesthetics of the plot so that each test location 
+# displays as a different line in a different color
 ggplot(Neonics) +
   geom_freqpoly(aes(x = Publication.Year, color = Test.Location))
 
@@ -181,10 +186,15 @@ NOEL: No-observable-effect-level: highest dose (concentration) producing effects
 
 ```{r Set collectDate to Date Class}
 
-class(Litter$collectDate) # original class is factor
-Litter$collectDate <- as.Date(Litter$collectDate, format = "%Y-%m-%d") # use the as date function to change the class
-class(Litter$collectDate) # updated class is a date
-Litter$collectDate # print the dates to check that they were properly formatted after changing the class
+class(Litter$collectDate) 
+# original class is factor
+Litter$collectDate <- as.Date(Litter$collectDate, format = "%Y-%m-%d") 
+# use the as date function to change the class
+class(Litter$collectDate) 
+# updated class is a date
+Litter$collectDate 
+# print the dates to check that they were properly formatted 
+# after changing the class
  
 ```
 
