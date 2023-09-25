@@ -14,7 +14,7 @@ knitr::opts_chunk$set(message = FALSE, warning = FALSE)
 library(tidyverse);library(lubridate); library(here)
 
 #Read in data, don't convert strings to factors
-sites <- read.csv(here('Data/Raw/NWIS_SiteFlowData_NE_Raw.csv'))
+sites <- read.csv(here('Data/Raw/NWIS_SiteFlowData_NE_RAW.csv'))
 dim(sites)
 
 #Convert date column to date object
@@ -83,7 +83,7 @@ levels(sites$dow)
 #Plot again
 ggplot(sites,aes(x=dow)) +
   geom_bar() + 
-  scale_x_discrete(drop=FALSE)
+  scale_x_discrete(drop=FALSE) #dont drop the levels that have no data
 
 ```
 

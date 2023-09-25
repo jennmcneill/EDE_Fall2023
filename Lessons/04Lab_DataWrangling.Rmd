@@ -1,4 +1,6 @@
 ---
+editor_options: 
+  chunk_output_type: console
 ---
 title: "Lab 4: Data Wrangling"
 author: "Environmental Data Analytics | John Fay and Luana Lima | Developed by Kateri Salk"
@@ -25,6 +27,7 @@ Opening discussion: why might we be interested in long-term observations of temp
 #Install packages
 library(tidyverse)
 library(lubridate)
+#install.packages("here")
 library(here) #The here package allows for better control of relative paths
 
 #Ensure that "here" points to your project folder
@@ -58,7 +61,10 @@ class(NTL.phys.data$lakeid)
 class(NTL.phys.data$depth)
 
 # dplyr filtering
-NTL.phys.data.surface <- filter(NTL.phys.data, depth == 0)
+NTL.phys.data.surface <- filter(NTL.phys.data, depth == 0) #use equivalence operator ==
+
+# use levels() or unique() to get unique values in a column
+#levels(NTL.phys.data$lakename)
 
 # Choose multiple conditions to filter
 summary(NTL.phys.data$lakename)
@@ -73,12 +79,14 @@ NTL.phys.data.JunethruOctober <- filter(NTL.phys.data, daynum %in% c(152:304))
 ```{r Exercise 1 & 2}
 # Exercise 1: 
 # filter NTL.phys.data for the year 1999
-# what code do you need to use, based on the class of the variable?
+# what code do you need to use, based on the class of the variable? 
 
+class(NTL.phys.data$year4)
+NTL.phys.data.1999 <- filter(NTL.phys.data, year4 == 1999)
 
 # Exercise 2: 
 # filter NTL.phys.data for Tuesday Lake from 1990 through 1999.
-
+NTL.phys.data.TuesdayLake <- filter(NTL.phys.data, lakename == 'Tuesday Lake', year4 %in% c(1990:1999))
 
 ```
 Question: Why don't we filter using row numbers?
@@ -104,11 +112,30 @@ NTL.phys.data.processed <-
 #Exercise 3: Using a pipe filter NTL.phys.data for Tuesday Lake from 1990 
 # through 1999 only for July.
 
+NTL.phys.data.TuesdayLake_pipe <-
+  NTL.phys.data %>%
+  filter(lakename == 'Tuesday Lake') %>%
+  mutate(month = month(sampledate)) %>%
+  filter(month == 7) %>%
+  filter(year4 %in% c(1990:1999))
+
+#NTL.phys.data.TuesdayLake_pipe_other <-
+  #NTL.phys.data.TuesdayLake %>%
+  #mutate(month = month(sampledate)) %>%
+  #filter(month == 7)
+  
+
 
 #Exercise 4: Using the data from part 3, a pipe, and the summarize() function 
 # find the mean surface temperature (hints: you will need to add another
 # filter for depth==0). Make sure you eliminate NAs before computing the means.
-
+NTL.phys.data.TuesdayLake_pipe_2 <-
+  NTL.phys.data %>%
+  filter(lakename == 'Tuesday Lake') %>%
+  mutate(month = month(sampledate)) %>%
+  filter(month == 7) %>%
+  filter(year4 %in% c(1990:1999)) %>%
+  filter(depth == 0)
   
 ```
 
