@@ -63,24 +63,24 @@ vignette("dplyr")
 Filtering allows us to choose certain rows (observations) in our dataset.
 
 Here are the relevant commands used in the `filter` function. Add some notes to designate what these commands mean. 
-`==`
-`!=`
-`<`
-`<=`
-`>`
-`>=`
-`&`
-`|`
+`==` #compare your value to a specific value
+`!=` #check if variables are different
+`<` #check for values that are less than a specific value
+`<=` #check for values that are less than or equal to a specific value
+`>` #check for values that are greater than a specific value
+`>=` #check for values that are greater than or equal to a specific value
+`&` #aggregate multiple conditions to check simultaneously if all should be true
+`|` #aggregate multiple conditions to check simultaneously if not all should be true
 
 ```{r filtering data}
 class(NTL.phys.data$lakeid)
 class(NTL.phys.data$depth)
 
 # matrix filtering
-NTL.phys.data.surface1 <- NTL.phys.data[NTL.phys.data$depth == 0,]
+NTL.phys.data.surface1 <- NTL.phys.data[NTL.phys.data$depth == 0,] #filter only the rows that have 0 for column depth, no rule for the columns)
 
 # dplyr filtering
-NTL.phys.data.surface2 <- filter(NTL.phys.data, depth == 0)
+NTL.phys.data.surface2 <- filter(NTL.phys.data, depth == 0) #first argument data set, second argument is what you're trying to filter
 NTL.phys.data.surface3 <- filter(NTL.phys.data, depth < 0.25)
 
 # Did the methods arrive at the same result?
@@ -92,20 +92,23 @@ head(NTL.phys.data.surface3)
 dim(NTL.phys.data.surface3)
 
 # Choose multiple conditions to filter
+# filtering only chooses rows we are not doing anything with columns yet
 summary(NTL.phys.data$lakename)
-NTL.phys.data.PeterPaul1 <- filter(NTL.phys.data, lakename == "Paul Lake" | lakename == "Peter Lake")
+NTL.phys.data.PeterPaul1 <- filter(NTL.phys.data, lakename == "Paul Lake" | lakename == "Peter Lake") #peter lake OR paul lake
 NTL.phys.data.PeterPaul2 <- filter(NTL.phys.data, lakename != "Central Long Lake" & 
                                      lakename != "Crampton Lake" & lakename != "East Long Lake" &
                                      lakename != "Hummingbird Lake" & lakename != "Tuesday Lake" &
                                      lakename != "Ward Lake" & lakename != "West Long Lake")
+#exclude the other lakes that you are not interested in, keeping peter and paul left
 NTL.phys.data.PeterPaul3 <- filter(NTL.phys.data, lakename %in% c("Paul Lake", "Peter Lake"))
+#%in% helps you select more at once because you use names within the vector data set
 
 # Choose a range of conditions of a numeric or integer variable
 summary(NTL.phys.data$daynum)
 NTL.phys.data.JunethruOctober1 <- filter(NTL.phys.data, daynum > 151 & daynum < 305)
 NTL.phys.data.JunethruOctober2 <- filter(NTL.phys.data, daynum > 151, daynum < 305)
 NTL.phys.data.JunethruOctober3 <- filter(NTL.phys.data, daynum >= 152 & daynum <= 304)
-NTL.phys.data.JunethruOctober4 <- filter(NTL.phys.data, daynum %in% c(152:304))
+NTL.phys.data.JunethruOctober4 <- filter(NTL.phys.data, daynum %in% c(152:304)) #think of this as a value matching operator
 
 # Exercise: 
 # filter NTL.phys.data for the year 1999
@@ -157,13 +160,13 @@ NTL.phys.data.temps <- mutate(NTL.phys.data.temps, temperature_F = (temperature_
 A package that makes coercing date much easier is `lubridate`. A guide to the package can be found at https://lubridate.tidyverse.org/. The cheat sheet within that web page is excellent too. This package can do many things (hint: look into this package if you are having unique date-type issues), but today we will be using two of its functions for our NTL dataset. 
 
 ```{r using lubridate}
-# add a month column to the dataset
+# add a month column to the dataset. returns the month for each observation.
 NTL.phys.data.PeterPaul1 <- mutate(NTL.phys.data.PeterPaul1, month = month(sampledate)) 
 
 # reorder columns to put month with the rest of the date variables
 NTL.phys.data.PeterPaul1 <- select(NTL.phys.data.PeterPaul1, lakeid:daynum, month, sampledate:comments)
 
-# find out the start and end dates of the dataset
+# find out the start and end dates of the dataset using interval function using matrix positions or first and last
 interval(NTL.phys.data.PeterPaul1$sampledate[1], NTL.phys.data.PeterPaul1$sampledate[21613])
 interval(first(NTL.phys.data.PeterPaul1$sampledate), last(NTL.phys.data.PeterPaul1$sampledate))
 ```
@@ -176,11 +179,17 @@ Sometimes we will want to perform multiple functions on a single dataset on our 
 Let's say we want to take our raw dataset (NTL.phys.data), *then* filter the data for Peter and Paul lakes, *then* select temperature and observation information, and *then* add a column for temperature in Fahrenheit: 
 
 ```{r using pipes}
+#create new data frame
 NTL.phys.data.processed <- 
+  #start with original data
   NTL.phys.data %>%
+  #filter by lake name
   filter(lakename == "Paul Lake" | lakename == "Peter Lake") %>%
+  #select specific columns and ranges
   select(lakename, sampledate:temperature_C) %>%
+  #create another column for temp in F
   mutate(temperature_F = (temperature_C*9/5) + 32)
+#because this is all performed in a pipe you do not have to specify the original data set at each step
   
 ```
 
