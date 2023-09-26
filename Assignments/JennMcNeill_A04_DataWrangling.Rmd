@@ -1,8 +1,10 @@
 ---
 title: "Assignment 4: Data Wrangling"
-author: "Student Name"
+author: "Jenn McNeill"
 output: pdf_document
 geometry: margin=2.54cm
+editor_options: 
+  chunk_output_type: console
 ---
 
 ## OVERVIEW
@@ -32,12 +34,24 @@ The completed exercise is due on Thursday, Sept 28th @ 5:00pm.
 
 ```{r setup, message = FALSE}
 #1a 
+library(tidyverse)
+library(lubridate)
+library(here)
 
 #1b 
+getwd()
 
 #1c 
+EPAair_O3_NC2018 <- read.csv("./Data/Raw/EPAair_O3_NC2018_raw.csv", stringsAsFactors = TRUE)
+EPAair_O3_NC2019 <- read.csv("./Data/Raw/EPAair_O3_NC2019_raw.csv", stringsAsFactors = TRUE)
+EPAair_PM25_NC2018 <- read.csv("./Data/Raw/EPAair_PM25_NC2018_raw.csv", stringsAsFactors = TRUE)
+EPAair_PM25_NC2019 <- read.csv("./Data/Raw/EPAair_PM25_NC2019_raw.csv", stringsAsFactors = TRUE)
 
 #2 
+glimpse(EPAair_O3_NC2018)
+glimpse(EPAair_O3_NC2019)
+glimpse(EPAair_PM25_NC2018)
+glimpse(EPAair_PM25_NC2019)
 
 ```
 
@@ -55,12 +69,30 @@ The completed exercise is due on Thursday, Sept 28th @ 5:00pm.
 ```{r}
 #3
 
+EPAair_O3_NC2018$Date <- mdy(EPAair_O3_NC2018$Date)
+EPAair_O3_NC2019$Date <- mdy(EPAair_O3_NC2019$Date)
+EPAair_PM25_NC2018$Date <- mdy(EPAair_PM25_NC2018$Date)
+EPAair_PM25_NC2019$Date <- mdy(EPAair_PM25_NC2019$Date)
+
 #4
+EPAair_O3_NC2018 <- select(EPAair_O3_NC2018, Date, DAILY_AQI_VALUE:Site.Name, AQS_PARAMETER_DESC, COUNTY:SITE_LONGITUDE)
+EPAair_O3_NC2019 <- select(EPAair_O3_NC2019, Date, DAILY_AQI_VALUE:Site.Name, AQS_PARAMETER_DESC, COUNTY:SITE_LONGITUDE)
+EPAair_PM25_NC2018 <- select(EPAair_PM25_NC2018, Date, DAILY_AQI_VALUE:Site.Name, AQS_PARAMETER_DESC, COUNTY:SITE_LONGITUDE)
+EPAair_PM25_NC2019 <- select(EPAair_PM25_NC2019, Date, DAILY_AQI_VALUE:Site.Name, AQS_PARAMETER_DESC, COUNTY:SITE_LONGITUDE)
 
 #5
+EPAair_PM25_NC2018$AQS_PARAMETER_DESC <- "PM2.5"
+#EPAair_PM25_NC2018$AQS_PARAMETER_DESC <- as_factor(EPAair_PM25_NC2018$AQS_PARAMETER_DESC)
+EPAair_PM25_NC2019$AQS_PARAMETER_DESC <- "PM2.5"
+#EPAair_PM25_NC2019$AQS_PARAMETER_DESC <- as_factor(EPAair_PM25_NC2019$AQS_PARAMETER_DESC)
 
 #6
-
+write.csv(EPAair_O3_NC2018, row.names = FALSE, file = 
+            "./Data/Processed/EPAair_O3_NC2018_processed.csv")
+write.csv(EPAair_O3_NC2019, row.names = FALSE, file = 
+            "./Data/Processed/EPAair_O3_NC2019_processed.csv")
+write.csv(EPAair_PM25_NC2018, row.names = FALSE, file = "./Data/Processed/EPAair_PM25_NC2018_processed.csv")
+write.csv(EPAair_PM25_NC2019, row.names = FALSE, file = "./Data/Processed/EPAair_PM25_NC2019_processed.csv")
 ```
 
 
@@ -87,9 +119,23 @@ The completed exercise is due on Thursday, Sept 28th @ 5:00pm.
 ```{r}
 #7 
 
+EPAair_2018_2019 <- rbind(EPAair_O3_NC2018, EPAair_O3_NC2019, EPAair_PM25_NC2018, EPAair_PM25_NC2019)
+
 #8 
 
+EPAair_2018_2019_processed <- 
+  #start with original dataframe
+  EPAair_2018_2019 %>%
+  #filter by site name to remove unwanted rows
+  filter(Site.Name %in% c("Linville Falls", "Durham Armory", "Leggett", "Hattie Avenue", "Clemmons Middle", "Mendenhall School", "Frying Pan Mountain", "West Johnston Co.", "Garinger High School", "Castle Hayne", "Pitt Agri. Center", "Bryson City", "Millbrook School")) %>%
+  mutate(month = month(Date), year = year(Date)) %>%
+  group_by(Date, Site.Name, AQS_PARAMETER_DESC, COUNTY) %>%
+  summarise(meanAQI = mean(DAILY_AQI_VALUE), 
+            meanLAT = mean(SITE_LATITUDE), 
+            meanLONG = mean(SITE_LONGITUDE))
+
 #9
+
 
 #10
 
@@ -107,7 +153,12 @@ The completed exercise is due on Thursday, Sept 28th @ 5:00pm.
 ```{r}
 
 #12
-
+EPA_air_2018_2019_summary <-
+  EPAair_2018_2019_processed %>%
+  group_by(Site.Name, month, year, AQS_PARAMETER_DESC) %>%
+  summarize(meanAQI = mean(DAILY_AQI_VALUE)) %>%
+  drop_na(meanAQI)
+  
 
 #13
 
