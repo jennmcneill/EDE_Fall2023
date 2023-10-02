@@ -20,15 +20,16 @@ Effective data visualization depends on purposeful choices about graph types. Th
 
 ```{r, message = FALSE, warning = FALSE}
 library(tidyverse);library(lubridate);library(here)
+install.packages("ggridges")
 library(ggridges)
 
 here()
 
 PeterPaul.chem.nutrients <- 
-  read.csv(here("Data/Processed_KEY/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv"), stringsAsFactors = TRUE)
+  read.csv(here("Data/Processed/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv"), stringsAsFactors = TRUE)
 PeterPaul.chem.nutrients.gathered <-
-  read.csv(here("Data/Processed_KEY/NTL-LTER_Lake_Nutrients_PeterPaulGathered_Processed.csv"), stringsAsFactors = TRUE)
-EPAair <- read.csv(here("Data/Processed_KEY/EPAair_O3_PM25_NC1819_Processed.csv"), stringsAsFactors = TRUE)
+  read.csv(here("Data/Processed/NTL-LTER_Lake_Nutrients_PeterPaulGathered_Processed.csv"), stringsAsFactors = TRUE)
+EPAair <- read.csv(here("Data/Processed/EPAair_O3_PM25_NC1819_Processed.csv"), stringsAsFactors = TRUE)
 
 EPAair$Date <- ymd(EPAair$Date)
 PeterPaul.chem.nutrients$sampledate <- ymd(PeterPaul.chem.nutrients$sampledate)
@@ -77,7 +78,7 @@ Here are some commonly used aesthetic types that can be manipulated in ggplot:
 ### Plotting continuous variables over time: Scatterplot and Line Plot
 
 ```{r, fig.height = 3, fig.width = 4, warning = FALSE}
-# Scatterplot
+# Scatterplot #this shows two different ways to do the same thing
 ggplot(EPAair, aes(x = Date, y = Ozone)) + 
   geom_point()
 
@@ -87,17 +88,20 @@ print(O3plot)
 
 # Fix this code
 O3plot2 <- ggplot(EPAair) +
-  geom_point(aes(x = Date, y = Ozone, color = "blue"))
+  #geom_point(aes(x = Date, y = Ozone, color = "blue")) #this is the wrong way
+  geom_point(aes(x = Date, y = Ozone), color = "blue") #put color outside parentheses
 print(O3plot2)
 
 # Add additional variables
-# How could you automatically assign a marker color to a variable? 
+# How could you automatically assign a marker color to a variable? ggplot does this automatically
+# this is asking R to assign a different shape to each dot based on the year
 PMplot <- 
   ggplot(EPAair, aes(x = Month, y = PM2.5, shape = as.factor(Year), color = Site.Name)) +
   geom_point()
 print(PMplot)
 
 # Separate plot with facets
+#create a plot for each site
 PMplot.faceted <-
   ggplot(EPAair, aes(x = Month, y = PM2.5, shape = as.factor(Year))) +
   geom_point() +
@@ -146,7 +150,7 @@ tempvsdepth <-
   ggplot(PeterPaul.chem.nutrients, aes(x = temperature_C, y = depth)) +
   #ggplot(PeterPaul.chem.nutrients, aes(x = temperature_C, y = depth, color = daynum)) +
   geom_point() +
-  scale_y_reverse()
+  scale_y_reverse() #change the y axis to have 0 on top and 20 on bottom
 print(tempvsdepth)
 
 NvsP <-
@@ -167,7 +171,7 @@ What might be more effective ways to display the information? Navigate to the bo
 # Box and whiskers plot
 Nutrientplot3 <-
   ggplot(PeterPaul.chem.nutrients.gathered, aes(x = lakename, y = concentration)) +
-  geom_boxplot(aes(color = nutrient)) # Why didn't we use "fill"?
+  geom_boxplot(aes(color = nutrient)) # Why didn't we use "fill"? fill only fills the box and keeps everything else black. ugly!
 print(Nutrientplot3)
 
 # Dot plot
