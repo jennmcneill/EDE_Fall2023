@@ -4,8 +4,8 @@ author: "Jenn McNeill"
 date: "Fall 2023"
 output: pdf_document
 geometry: margin=2.54cm
-fig_height: 3
-fig_width: 4
+fig_height: 4
+fig_width: 5
 editor_options: 
   chunk_output_type: console
 ---
@@ -32,8 +32,27 @@ This exercise accompanies the lessons in Environmental Data Analytics on Data Vi
 
 ```{r initialize project}
 #1 
+library(tidyverse)
+library(lubridate)
+library(here)
+library(cowplot)
+library(ggthemes)
+
+here()
+
+PeterPaul.chem.nutrients <- 
+  read.csv(here(
+    "Data/Processed_KEY/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv"),
+    stringsAsFactors = TRUE)
+NiwotRidge_litter <- read.csv(here(
+  "Data/Processed_KEY/NEON_NIWO_Litter_mass_trap_Processed.csv"),
+  stringsAsFactors = TRUE)
 
 #2 
+PeterPaul.chem.nutrients$sampledate <- 
+  ymd(PeterPaul.chem.nutrients$sampledate)
+NiwotRidge_litter$collectDate <- 
+  ymd(NiwotRidge_litter$collectDate)
 
 ```
 ## Define your theme
@@ -46,7 +65,37 @@ This exercise accompanies the lessons in Environmental Data Analytics on Data Vi
 
 ```{r build plot theme}
 #3
+jenn_default_theme <- theme_classic() + 
+  theme(
+    #customize the plot background, title text, and axis title text
+    panel.background = element_rect(fill = "grey97"),
+    plot.title = element_text(size = 14, 
+                              face = "bold", 
+                              color = "violetred4"),
+    axis.title.x = element_text(size = 10, 
+                                face = "bold", 
+                                color = "tomato3"),
+    axis.title.y = element_text(size = 10, 
+                                face = "bold", 
+                                color = "tomato3"),
+    
+    # customize the axis ticks and gridlines
+    axis.text = element_text(size = 8, color = "grey44"),
+    axis.line = element_line(color = "grey44"),
+    panel.grid.major = element_line(color = "grey44", 
+                                    linetype = "dotted"),
+  
+    # customize the legend
+    legend.position = "right",
+    legend.title = element_text(size = 12, 
+                                face = "bold", 
+                                color = "darkolivegreen"),
+    legend.text = element_text(size = 10, 
+                               color = "darkolivegreen"),
+    line = element_line(0.5))
 
+#set as default theme
+theme_set(jenn_default_theme)
 ```
 
 ## Create graphs
@@ -56,7 +105,20 @@ For numbers 4-7, create ggplot graphs and adjust aesthetics to follow best pract
 
 ```{r plot total P vs PO4}
 #4 
+total_phosphorus_plot <-   
+  ggplot(PeterPaul.chem.nutrients,
+         aes(x = po4, 
+             y = tp_ug, 
+             color = lakename))+
+  geom_point()+
+  geom_smooth(method="lm", color="black")+
+  xlim(0, 50)+
+  ylim(0, 150)+
+  xlab(expression(paste("Phosphate (", mu, "g)")))+
+  ylab(expression(paste("Total Phosphorus (", mu, "g)")))+
+  ggtitle("Total Phosphorus as a Function of Phosphate")
 
+print(total_phosphorus_plot)
 ```
 
 
@@ -66,14 +128,61 @@ Tip:
 * Recall the discussion on factors in the previous section as it may be helpful here. 
 * R has a built-in variable called `month.abb` that returns a list of months;see <https://r-lang.com/month-abb-in-r-with-example>
 
-```{r Create boxplots}
+```{r Create boxplots, fig.height=6, fig.width=8}
 #5 
+temperature_plot <-
+  ggplot(PeterPaul.chem.nutrients)+
+  geom_boxplot(aes(x=factor(month,
+                            levels=1:12,
+                            labels=month.abb), 
+                   y=temperature_C, 
+                   color = lakename))+
+  xlab("")+
+  scale_x_discrete(drop = FALSE)+
+  ylab(expression(paste("Temperature (", ~degree, "C)")))+
+  ggtitle("Lake Temperature in a Given Month")
+print(temperature_plot)
 
+TP_plot <-
+  ggplot(PeterPaul.chem.nutrients)+
+  geom_boxplot(aes(x=factor(month,
+                            levels=1:12,
+                            labels=month.abb), 
+                   y = tp_ug, 
+                   color = lakename))+
+  xlab("")+
+  scale_x_discrete(drop = FALSE)+
+  ylab(expression(paste("Total Phosphorus (", mu, "g)")))+
+  ggtitle("Total Phosphorus in a Given Month")
+print(TP_plot)
+
+TN_plot <-
+  ggplot(PeterPaul.chem.nutrients)+
+  geom_boxplot(aes(x=factor(month,
+                            levels=1:12,
+                            labels=month.abb), 
+                   y = tn_ug, 
+                   color = lakename))+
+  xlab("")+
+  scale_x_discrete(drop = FALSE)+
+  ylab(expression(paste("Total Nitrogen (", mu, "g)")))+
+  ggtitle("Total Nitrogen in a Given Month")
+print(TN_plot)
+
+combined_plot <-
+  plot_grid(temperature_plot + theme(legend.position = "none"), 
+            TP_plot + theme(legend.position = "none"), 
+            TN_plot + theme(legend.position = "bottom"), 
+            ncol = 1, 
+            align = "vh", 
+            rel_heights = c(1.5, 1.5, 2))+
+  scale_x_discrete(drop = FALSE)
+print(combined_plot)
 ```
 
 Question: What do you observe about the variables of interest over seasons and between lakes? 
 
-> Answer: 
+> Answer: From May until September, the average temperature in Paul Lake is slightly higher than the average temperature in Peter Lake. Once fall begins in October, the temperature in Peter Lake is higher than Paul Lake. These averages likely demonstrate that Paul Lake is more shallow and thus more suseptible to temperature change as the weather outside changes. Peter Lake, likely being the deeper of the two, can hold its heat more effectively as the summer ends and the weather gets colder. The relative temperature drop from September to October in both lakes supports this hypothesis. The Total Phosphorus and Total Nitrogen, on average, are slightly higher in Peter Lake than in Paul Lake for all months. This fact would also support the hypothesis that Peter Lake is deeper than Paul Lake and thus has more volume in which phosphorus and nitrogen can thrive.
 
 6. [Niwot Ridge] Plot a subset of the litter dataset by displaying only the "Needles" functional group. Plot the dry mass of needle litter by date and separate by NLCD class with a color aesthetic. (no need to adjust the name of each land use)
 
@@ -81,12 +190,43 @@ Question: What do you observe about the variables of interest over seasons and b
 
 ```{r Plot litter}
 #6
-
+litter_subset_plot <-
+  ggplot(filter(NiwotRidge_litter,
+                functionalGroup=="Needles"),
+           aes(x = factor(collectDate), 
+               y = dryMass, 
+               color = nlcdClass,
+               shape = nlcdClass))+
+  geom_point()+
+  xlab("Sample Date")+ 
+  ylab("Dry Mass of Needles (g)")+
+  ggtitle("Dry Mass of Needles on a Given Day According to NLCD Class")+
+  jenn_default_theme+
+  theme(axis.text.x = element_text(angle = 60, 
+                                   vjust = 1, 
+                                   hjust = 1),
+        legend.position = "bottom")
+print(litter_subset_plot)
 
 #7
-
-
+litter_facet_plot <-
+  ggplot(filter(NiwotRidge_litter,
+                functionalGroup=="Needles"),
+           aes(x = factor(collectDate), 
+               y = dryMass,
+               shape = nlcdClass))+
+  geom_point()+
+  facet_wrap(vars(nlcdClass), nrow = 3)+
+  xlab("Sample Date")+
+  ylab("Dry Mass of Needles (g)")+
+  ggtitle("Dry Mass of Needles on a Given Day According to NLCD Class")+
+  jenn_default_theme+
+  theme(axis.text.x = element_text(angle = 60, 
+                                   vjust = 1, 
+                                   hjust = 1),
+        legend.position = "bottom")
+print(litter_facet_plot)
 ```
 Question: Which of these plots (6 vs. 7) do you think is more effective, and why? 
 
-> Answer:
+> Answer: I think that the plot showing NLCD Class separated by color aesthetic is more effective because it is easier for the viewer to compare all classes at one time. For any given sample date, the reader can quickly see which points are highest and lowest. The graph with three facets makes it more difficult to compare the data points because the reader has to jump between plots and may not remember how the numbers compare to one another. I prefer the plot with all of the data points together because it makes it easiest to compare the data and glean relationships between NLCD Classes. 
