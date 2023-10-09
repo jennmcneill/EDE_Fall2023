@@ -10,8 +10,18 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## R Markdown
+### Subheader
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+>This is a block quote
+
+1. Step 1
+2. Step 2
+3. Step 3
+
+* First bullet
+* Second bullet
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see [mylink](http://rmarkdown.rstudio.com).
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
@@ -28,3 +38,18 @@ plot(pressure)
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+```{r, echo = FALSE}
+
+#echo = FALSE shows output only
+#include = FALSE will exclude the code and the output even though the code gets run
+#eval = FALSE, include = FALSE means that code doesn't run and doesn't show up
+x = 1
+y = 13
+print(x+y)
+
+```
+
+
+
