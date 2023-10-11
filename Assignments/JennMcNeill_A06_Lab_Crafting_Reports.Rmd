@@ -5,7 +5,9 @@ date: "Fall 2023"
 output: pdf_document
 editor_options: 
   chunk_output_type: console
+toc: true
 ---
+
 
 ## Objectives:
 
@@ -67,7 +69,9 @@ Customize the chunk options such that the code is run but is not displayed in th
 >
 > -   If your output table spans across two pages, try inserting a page break in the markdown just before your code chunk.
 
-```{r data.summary}
+\newpage
+
+```{r data.summary, echo=FALSE, message=FALSE, warning=FALSE}
 #Compute mean PM2.5 concentration for each county, sorted by value
 summary_PM25 <- epa_data %>% 
   drop_na(PM2.5) %>% 
@@ -99,11 +103,33 @@ knitr::kable(summary_Ozone,
 
 Create two separate code chunks that create boxplots of the distribution of Ozone levels by month using, one for only records collected in 2018 and one for records in 2019. Customize the chunk options such that the final figures are displayed but not the code used to generate the figures. In addition, align the plots on the left side of the page and set the figure heights so both plots fit on the same page with minimal space remaining. Lastly, add a `fig.cap` chunk option to add a caption (title) to your plot that will display underneath the figure.
 
-```{r Ozone Distribution Boxplot 2018}
+```{r Ozone Distribution Boxplot 2018, echo=FALSE, message=FALSE, warning=FALSE, fig.align='left', fig.cap="Ozone Distribution Boxplot 2018", fig.height=4, fig.width=6}
+
+Ozone_2018_Plot <-
+  ggplot(filter(epa_data,Year==2018),
+         aes(x=factor(Month,levels=1:12,labels=month.abb),
+             y = Ozone))+
+  geom_boxplot()+
+  xlab("Month")+
+  scale_x_discrete(drop = FALSE)+
+  ylab(expression(paste("Ozone (", mu, "g/m"^"3", ")")))+
+  ggtitle("Ozone Levels by Month in 2018")
+print(Ozone_2018_Plot)
 
 ```
 
-```{r Ozone Distribution Boxplot 2019}
+```{r Ozone Distribution Boxplot 2019, echo=FALSE, message=FALSE, warning=FALSE, fig.align='left', fig.cap="Ozone Distribution Boxplot 2019", fig.height=4, fig.width=6}
+
+Ozone_2019_Plot <-
+  ggplot(filter(epa_data,Year==2019),
+         aes(x=factor(Month,levels=1:12,labels=month.abb),
+             y = Ozone))+
+  geom_boxplot()+
+  xlab("Month")+
+  scale_x_discrete(drop = FALSE)+
+  ylab(expression(paste("Ozone (", mu, "g/m"^"3", ")")))+
+  ggtitle("Ozone Levels by Month in 2019")
+print(Ozone_2019_Plot)
 
 ```
 
