@@ -161,7 +161,7 @@ TN_plot <-
   geom_boxplot(aes(x=factor(month,
                             levels=1:12,
                             labels=month.abb), 
-                   y = tn_ug, 
+                   y = tn_ug,  
                    color = lakename))+
   xlab("")+
   scale_x_discrete(drop = FALSE)+
