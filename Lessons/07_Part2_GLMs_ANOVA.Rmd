@@ -17,7 +17,9 @@ editor_options:
 
 library(tidyverse)
 #install.packages("agricolae")
+#install.packages("htmltools")
 library(agricolae)   #you may need to install/update package "htmltools" before installing and loading agricolae
+library(htmltools)
 library(here)
 here()
 
@@ -27,6 +29,7 @@ Litter <- read.csv(here("Data/Processed_KEY/NEON_NIWO_Litter_mass_trap_Processed
 Litter$collectDate <- as.Date(Litter$collectDate , format = "%Y-%m-%d")
 
 # Set theme
+library(ggthemes)
 mytheme <- theme_classic(base_size = 14) +
   theme(axis.text = element_text(color = "black"), 
         legend.position = "top")
@@ -157,6 +160,7 @@ If the interaction is significant, we interpret pairwise differences for the int
 # Run a post-hoc test for pairwise differences
 TukeyHSD(Litter.anova.2way3)
 
+#you're going to end up with 24 classes because that is the result of the interaction of functional group and nlcd class
 Litter.interaction <- with(Litter, interaction(functionalGroup, nlcdClass))
 
 #Litter.test <- cbind(Litter,Litter.interaction)

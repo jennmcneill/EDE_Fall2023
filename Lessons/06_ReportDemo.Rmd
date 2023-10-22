@@ -13,8 +13,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### Subheader
 
-toc: true
-
 > This is a block quote
 
 1.  Step 1

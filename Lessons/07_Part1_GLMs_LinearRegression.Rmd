@@ -78,6 +78,9 @@ irradiance.regression <-
        PeterPaul.chem.nutrients$depth)
 
 # another way to format the lm() function
+#trying to explain irradiance based on depth
+#you don't need to use the $ here because we defined our data
+#this is the preferred way of calling the lm() function
 irradiance.regression <- lm(
   data = PeterPaul.chem.nutrients,
   irradianceWater ~ depth)
@@ -85,6 +88,9 @@ summary(irradiance.regression)
 
 # Correlation
 cor.test(PeterPaul.chem.nutrients$irradianceWater, PeterPaul.chem.nutrients$depth)
+
+#there is a significant negative correlation between irradiance and depth: lower irradiance levels at lower depth
+#the model explains about 31% of the total variance in irradiance (we know this because the R^2 value is 0.3091)
 ```
 Question: How would you report the results of this test (overall findings and report of statistical output)?
 
@@ -103,6 +109,7 @@ An exploratory option to visualize the model fit is to use the function `plot`. 
 4. **Residuals vs. Leverage.** This graph will display potential outliers. The values that fall outside the dashed red lines (Cook's distance) are outliers for the model. Watch for drastic departures of the solid red line from horizontal - this is a sign of a poor model fit.
 
 ```{r, fig.height = 3, fig.width = 4}
+#divide plot screen into a grid of four cells
 par(mfrow = c(2,2), mar=c(4,4,4,4))
 plot(irradiance.regression)
 par(mfrow = c(1,1))
@@ -117,6 +124,9 @@ irradiancebydepth <-
   ylim(0, 2000) +
   geom_point() 
 print(irradiancebydepth) 
+
+#this plot clearly shows us that we don't have a linear relationship between x and y
+#we can try to log transform the values
 ```
 
 Given the distribution of irradiance values, we don't have a linear relationship between x and y in this case. Let's try log-transforming the irradiance values. Note we also removing the observations that seems to ba an outlier.
@@ -135,6 +145,7 @@ par(mfrow = c(1,1))
 irradiancebydepth2 <- 
   ggplot(PeterPaul.chem.nutrients, aes(x = depth, y = irradianceWater)) +
   geom_smooth(method = "lm") +
+  #make the y axis the log scale
   scale_y_log10() +
   geom_point() 
 print(irradiancebydepth2) 
@@ -144,6 +155,7 @@ irradiancebydepth2 <-
     ggplot(PeterPaul.chem.nutrients, aes(x = depth, y = irradianceWater)) +
     geom_point() +
     scale_y_log10() +  #log transformed values for irradianceWater
+  #remove the gray "confidence interval" with se = FALSE
     geom_smooth(method = 'lm', se = FALSE, color = "black")
 print(irradiancebydepth2)
 
@@ -175,12 +187,13 @@ par(mfrow = c(1,1))
 We can also make exploratory plots of several continuous data points to determine possible relationships, as well as covariance among explanatory variables. 
 
 ```{r, fig.height = 3, fig.width = 4}
-#install.packages("corrplot")
+install.packages("corrplot")
 library(corrplot)
 PeterPaulnutrients <- 
   PeterPaul.chem.nutrients %>%
   select(tn_ug:po4) %>%
   na.omit()
+#new correlation function
 PeterPaulCorr <- cor(PeterPaulnutrients)
 corrplot(PeterPaulCorr, method = "ellipse")
 corrplot.mixed(PeterPaulCorr, upper = "ellipse")
