@@ -49,6 +49,44 @@ Create three plots, each with appropriately formatted axes and legends. Choose a
 ```{r}
 #Exercise 1:
 
+Ozone.density.plot <- ggplot(EPAair, aes(x = Ozone,
+                                         fill = factor(Year))) +
+  geom_density(alpha=0.5)+
+  scale_fill_manual(values=c("tomato","yellow"))+
+  xlab("Ozone AQI Value")+
+  ylab("Density")
+  # find a way to change the name of the legend with a similar command fill("Year")
+  #geom_vline(xintercept = 50, color = "#238b45", lty = 2, size = 0.9) +
+  #scale_x_continuous(expand = c(0, 0)) + 
+  #scale_y_continuous(expand = c(0, 0))
+print(Ozone.density.plot)
+
+Ozone.box.plot <- ggplot(EPAair, aes(x = factor(Year),
+                                     y = Ozone)) +
+  geom_boxplot() +
+  stat_summary(geom = "text",
+               fun = max,
+               vjust = -1,
+               size = 4,
+               label = c("b", "a")) +
+  xlab("") +
+  ylab("Ozone AQI Value") +
+  ylim(0,150)
+print(Ozone.box.plot)
+
+Ozone.violin.plot <- ggplot(EPAair, aes(x = factor(Year),
+                                        y = Ozone)) +
+  geom_violin(draw_quantiles = 0.5) +
+  stat_summary(geom = "text",
+               fun = max, #marks the max value with the label; you could also say min here
+               vjust = -1,
+               size = 4,
+               label = c("b", "a")) +
+  xlab("") +
+  ylab("Ozone AQI Value") +
+  ylim(0,150)
+print(Ozone.violin.plot)
+
 
 ```
 
@@ -62,10 +100,17 @@ For the NTL-LTER dataset, can we predict PM2.5 from Ozone?
 
 #Exercise 2: Run a linear regression PM2.5 by Ozone. Find the p-value and R-squared value. 
 
-
+PM.regression <- 
+  lm(data = EPAair, PM2.5 ~ Ozone)
+summary(PM.regression)
 
 #Exercise 3: Build a scatterplot. Add a line and standard error for the linear regression. Add the regression equation to the plot
 
+pm2.5_by_ozone <- 
+  ggplot(EPAair, aes(x = Ozone, y = PM2.5)) +
+    geom_smooth(method = "lm") +
+  geom_point() 
+print(pm2.5_by_ozone) 
 
 
 ```
