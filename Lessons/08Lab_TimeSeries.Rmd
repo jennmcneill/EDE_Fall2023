@@ -58,7 +58,11 @@ Temp_BR <- read.csv(here("Data/Raw/tas_1901_2016_BRA.csv"), stringsAsFactors = T
 Rainfall_BR_processed <-
   Rainfall_BR %>% 
   rename( Rainfall = Rainfall....MM.) %>% 
+  #similar to the text to column function in excel
+  #make three different columns, one with all spaces, one with month, one with average. 
+  #we are using the space as the separator. 
   separate(Statistics,c("Null","Month","Null2")," ") %>% 
+  #create a new column with month and year
   mutate( Date = my(paste0(Month,"-",Year))) %>% 
   select(Date,Rainfall)
 
@@ -84,16 +88,28 @@ BR_complete <- inner_join(Rainfall_BR_processed,Temp_BR_processed)
 
 #Exercise 5: Check if there is any missing data for both temperature and rainfall series.
 
-
-
+#when you call the summary, you can see that there are no NAs. 
+#this isn't the best way to check for missing data. if there were full years missing,
+#they would not show up as NAs
+#it is better to create a sequence of dates in a dataframe
+#you can do a left join of the new sequence on the original dataframe
+#left join will populate NA
+#then you do the summary
+summary(BR_complete$Rainfall)
+summary(BR_complete$Temperature_C)
 
 #Exercise 6: Plot both series over time on separate plots. Add a trend line using geom_smooth(). Can you say something about the trend just by visualizing the data?
 
+ggplot(BR_complete, aes(x = Date, y = Rainfall)) +
+  geom_line() +
+  geom_smooth()
 
+ggplot(BR_complete, aes(x = Date, y = Temperature_C)) +
+  geom_line() +
+  geom_smooth(method = lm)
 
-
-
-
+#the gray bars are how much you have to zoom in. bigger bar, less of an impact that has.
+#the rate of change of the first 15 years of temperature is slower than the last 85
 ```
 
 ## Creating time series objects
@@ -101,7 +117,8 @@ BR_complete <- inner_join(Rainfall_BR_processed,Temp_BR_processed)
 ```{r}
 #Exercise 7: Create a time series objects for each series using ts(). Make sure you specify the starting point and frequency.
 
-
+BR_Rainfall_ts <- ts(BR_complete$Rainfall, start = c(1901,1), frequency = 12)
+BR_Temperature_ts <- ts(BR_complete$Temperature_C, start = c(1901,1), frequency = 12)
 
 ```
 
@@ -123,9 +140,12 @@ The `stl` function decomposes the time series object into its component parts. W
 # Exercise 8: Use the stl() function to decompose both series. 
 # Visualize the decomposed series using plot(). What components can you identify?
 
+BR_Rainfall_Decomposed <- stl(BR_Rainfall_ts, s.window = "periodic")
+BR_Temperature_Decomposed <- stl(BR_Temperature_ts, s.window = "periodic")
 
-
-
+# Visualize the decomposed series. 
+plot(BR_Rainfall_Decomposed)
+plot(BR_Temperature_Decomposed)
 
 
 # Exercise 9: Use the times series object generated with the stl() to extract the 
