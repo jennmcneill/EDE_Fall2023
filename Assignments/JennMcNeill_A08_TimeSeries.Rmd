@@ -235,7 +235,7 @@ ggplot(GaringerOzone.monthly,
            y = aggregate_concentration)) +
   geom_point(size = 1) +
   geom_line() +
-  ylab("Aggregate Mean Ozone Concentration in Parts per Million") +
+  ylab("Aggregate Mean Ozone Concentration in ppm") +
   xlab("") +
   ggtitle("Garinger High School Monthly Mean Ozone Concentration in the 2010s") +
   scale_x_date(date_labels = "%Y", date_breaks = "1 year") +
@@ -245,7 +245,7 @@ ggplot(GaringerOzone.monthly,
 
 14. To accompany your graph, summarize your results in context of the research question. Include output from the statistical test in parentheses at the end of your sentence. Feel free to use multiple sentences in your interpretation.
 
-> Answer: 
+> Answer: Considering the research question, "Have ozone concentrations changed over the 2010s at this station?," we can discern from the graph that ozone concentrations have experienced a steady downward trend over the 2010 decade. Fitting the data with a linear regression model gives us this trendline. Our statistical Seasonal Mann-Kendall test corroborates this information because it provides a tau value of -0.143. This tau value being below zero represents a monotonic downward trend over time.
 
 15. Subtract the seasonal component from the `GaringerOzone.monthly.ts`. Hint: Look at how we extracted the series components for the EnoDischarge on the lesson Rmd file.
 
@@ -283,4 +283,4 @@ summary(Ozone_Monthly_SMK)
 
 ```
 
-> Answer: 
+> Answer: The non-seasonal and seasonal tau values are -0.165 and -0.143, respectively. Both of the tau values being negative proves what we discerned from our trend line: there is a monotonic downward trend of ozone concentration at Garinger High School over the 2010 decade. When we remove seasonality from the data, there is a stronger downward trend of ozone concentration because we are blocking out the effects 
