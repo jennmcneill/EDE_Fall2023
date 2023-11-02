@@ -79,19 +79,42 @@ theme_set(jenn_default_theme)
 #2
 
 # Import csv
-GaringerNC2010 <- read.csv(here("Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2010_raw.csv"), stringsAsFactors = TRUE)
-GaringerNC2011 <- read.csv(here("Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2011_raw.csv"), stringsAsFactors = TRUE)
-GaringerNC2012 <- read.csv(here("Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2012_raw.csv"), stringsAsFactors = TRUE)
-GaringerNC2013 <- read.csv(here("Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2013_raw.csv"), stringsAsFactors = TRUE)
-GaringerNC2014 <- read.csv(here("Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2014_raw.csv"), stringsAsFactors = TRUE)
-GaringerNC2015 <- read.csv(here("Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2015_raw.csv"), stringsAsFactors = TRUE)
-GaringerNC2016 <- read.csv(here("Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2016_raw.csv"), stringsAsFactors = TRUE)
-GaringerNC2017 <- read.csv(here("Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2017_raw.csv"), stringsAsFactors = TRUE)
-GaringerNC2018 <- read.csv(here("Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2018_raw.csv"), stringsAsFactors = TRUE)
-GaringerNC2019 <- read.csv(here("Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2019_raw.csv"), stringsAsFactors = TRUE)
+GaringerNC2010 <- read.csv(here(
+  "Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2010_raw.csv"), 
+  stringsAsFactors = TRUE)
+GaringerNC2011 <- read.csv(here(
+  "Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2011_raw.csv"), 
+  stringsAsFactors = TRUE)
+GaringerNC2012 <- read.csv(here(
+  "Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2012_raw.csv"), 
+  stringsAsFactors = TRUE)
+GaringerNC2013 <- read.csv(here(
+  "Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2013_raw.csv"), 
+  stringsAsFactors = TRUE)
+GaringerNC2014 <- read.csv(here(
+  "Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2014_raw.csv"), 
+  stringsAsFactors = TRUE)
+GaringerNC2015 <- read.csv(here(
+  "Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2015_raw.csv"), 
+  stringsAsFactors = TRUE)
+GaringerNC2016 <- read.csv(here(
+  "Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2016_raw.csv"), 
+  stringsAsFactors = TRUE)
+GaringerNC2017 <- read.csv(here(
+  "Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2017_raw.csv"), 
+  stringsAsFactors = TRUE)
+GaringerNC2018 <- read.csv(here(
+  "Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2018_raw.csv"), 
+  stringsAsFactors = TRUE)
+GaringerNC2019 <- read.csv(here(
+  "Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2019_raw.csv"), 
+  stringsAsFactors = TRUE)
 
 # Combine into a single dataframe
-GaringerOzone <- rbind(GaringerNC2010,GaringerNC2011,GaringerNC2012,GaringerNC2013,GaringerNC2014,GaringerNC2015,GaringerNC2016,GaringerNC2017,GaringerNC2018,GaringerNC2019)
+GaringerOzone <- rbind(GaringerNC2010,GaringerNC2011,GaringerNC2012,
+                       GaringerNC2013,GaringerNC2014,GaringerNC2015,
+                       GaringerNC2016,GaringerNC2017,GaringerNC2018,
+                       GaringerNC2019)
 
 ```
 
@@ -134,7 +157,7 @@ ggplot(GaringerOzone, aes(x = Date, y = Daily.Max.8.hour.Ozone.Concentration)) +
   geom_smooth(method = lm, se = FALSE, color = "tomato3") +
   xlab("") +
   ylab("Ozone Concentration in ppm") +
-  ggtitle("Daily Ozone Concentrations at Garinger High School in the 2010s") +
+  ggtitle("Daily Ozone Concentrations at Garinger High School") +
   scale_x_date(date_labels = "%Y", date_breaks = "1 year")
 
 ```
@@ -155,7 +178,7 @@ GaringerOzone_Clean <-
 
 ```
 
-> Answer: We used a linear interpolation because we wanted to fill in missing data using a "connect the dots" approach that assumes missing values fall between the previous and next measurements. We did not use a piecewise constant because this would fill in all missing data with whichever measurement was made on the nearest date. We did not use spline interpolation because this would fill in missing data using a quadratic function between neighboring data points instead of a straight line like we used in our linear interpolation.
+> Answer: We used a linear interpolation because we wanted to fill in missing data using a "connect the dots" approach that assumes missing values fall between the previous and next measurements. We did not use a piecewise constant because this would fill in all missing data with whichever measurement were made on the nearest date. We did not use spline interpolation because this would fill in missing data using a quadratic function between neighboring data points instead of a straight line like we used in our linear interpolation.
 
 9. Create a new data frame called `GaringerOzone.monthly` that contains aggregated data: mean ozone concentrations for each month. In your pipe, you will need to first add columns for year and month to form the groupings. In a separate line of code, create a new Date column with each month-year combination being set as the first day of the month (this is for graphing purposes only)
 
@@ -170,7 +193,7 @@ GaringerOzone.monthly <-
   # Group data for each month of a given year
   group_by(year,month) %>%
   # Sum the data for each month of a given year
-  summarize(aggregate_concentration = sum(Daily.Max.8.hour.Clean)) %>%
+  summarize(aggregate_concentration = mean(Daily.Max.8.hour.Clean)) %>%
   # Add a column that gives each month-year combination as the first of the month
   mutate(first_of_month = as.Date(paste(year, month, "01", sep = "-")))
   
@@ -224,7 +247,7 @@ summary(Ozone_Monthly_SMK)
 
 ```
 
-> Answer: The plots that I produced in #11 showed a strong seasonal component in the monthly time series, so it is best to analyze the trend using a test that factors in seasonality. None of the other three tests (Linear Regression, Mann-Kendall, Spearnan Rho) have this feature.
+> Answer: The plots that I produced in #11 showed a strong seasonal component in the monthly time series, so it is best to start the trend analysis using a test that factors in seasonality. None of the other three tests (Linear Regression, Mann-Kendall, Spearnan Rho) have this feature.
 
 13. Create a plot depicting mean monthly ozone concentrations over time, with both a geom_point and a geom_line layer. Edit your axis labels accordingly.
 
@@ -235,9 +258,9 @@ ggplot(GaringerOzone.monthly,
            y = aggregate_concentration)) +
   geom_point(size = 1) +
   geom_line() +
-  ylab("Aggregate Mean Ozone Concentration in ppm") +
+  ylab("Mean Ozone Concentration in ppm") +
   xlab("") +
-  ggtitle("Garinger High School Monthly Mean Ozone Concentration in the 2010s") +
+  ggtitle("Garinger High School Monthly Mean Ozone Concentration") +
   scale_x_date(date_labels = "%Y", date_breaks = "1 year") +
   geom_smooth(method = lm, se = FALSE, color = "tomato3")
 
@@ -245,7 +268,7 @@ ggplot(GaringerOzone.monthly,
 
 14. To accompany your graph, summarize your results in context of the research question. Include output from the statistical test in parentheses at the end of your sentence. Feel free to use multiple sentences in your interpretation.
 
-> Answer: Considering the research question, "Have ozone concentrations changed over the 2010s at this station?," we can discern from the graph that ozone concentrations have experienced a steady downward trend over the 2010 decade. Fitting the data with a linear regression model gives us this trendline. Our statistical Seasonal Mann-Kendall test corroborates this information because it provides a tau value of -0.143. This tau value being below zero represents a monotonic downward trend over time.
+> Answer: Considering the research question, "Have ozone concentrations changed over the 2010s at this station?," we can discern from the graph that ozone concentrations have experienced a steady downward trend over the 2010 decade. Fitting the data with a linear regression model gives us this trendline. Our statistical Seasonal Mann-Kendall test corroborates this information because it provides a tau value of -0.143. This tau value being below zero represents a monotonic downward trend over time. The pvalue of 0.046724, less than 0.05, shows that the results from this test are statistically significant and we should explore running the test with the seasonal component removed.
 
 15. Subtract the seasonal component from the `GaringerOzone.monthly.ts`. Hint: Look at how we extracted the series components for the EnoDischarge on the lesson Rmd file.
 
@@ -254,7 +277,8 @@ ggplot(GaringerOzone.monthly,
 ```{r}
 #15
 # Separate the seasonal, trend, and remainder from the decomposed ts
-GaringerOzone.monthly.components <- as.data.frame(GaringerOzone.monthly.ts.decomposed$time.series[,1:3])
+GaringerOzone.monthly.components <- as.data.frame(
+  GaringerOzone.monthly.ts.decomposed$time.series[,1:3])
 
 # Create a new df that includes seasonal, trend, remainder,
 # aggregate, date, and the new aggregate after subtracting seasonal
@@ -265,14 +289,16 @@ GaringerOzone.monthly.without.seasonality <-
         Observed_Aggregate_Without_Seasonality = Observed_Aggregate - seasonal)
 
 # Create a new time series object of the aggregate values without seasonality
-GaringerOzone.monthly.ts.without.seasonality <- ts(GaringerOzone.monthly.without.seasonality$Observed_Aggregate_Without_Seasonal, 
+GaringerOzone.monthly.ts.without.seasonality <- ts(
+  GaringerOzone.monthly.without.seasonality$Observed_Aggregate_Without_Seasonal, 
                                            frequency = 12, 
                                            start = 2010)
 
 
 #16
 # Run MK test
-Ozone_Monthly_MK <- Kendall::MannKendall(GaringerOzone.monthly.ts.without.seasonality)
+Ozone_Monthly_MK <- Kendall::MannKendall(
+  GaringerOzone.monthly.ts.without.seasonality)
 
 # Inspect results
 Ozone_Monthly_MK
@@ -283,4 +309,4 @@ summary(Ozone_Monthly_SMK)
 
 ```
 
-> Answer: The non-seasonal and seasonal tau values are -0.165 and -0.143, respectively. Both of the tau values being negative proves what we discerned from our trend line: there is a monotonic downward trend of ozone concentration at Garinger High School over the 2010 decade. When we remove seasonality from the data, there is a stronger downward trend of ozone concentration because we are blocking out the effects 
+> Answer: The non-seasonal and seasonal tau values are -0.165 and -0.143, respectively. Both of the tau values being negative proves what we discerned from our trend line: there is a monotonic downward trend of ozone concentration at Garinger High School over the 2010 decade. When we remove seasonality from the data, there is a stronger downward trend of ozone concentration because we are blocking out the noise of seasonal changes that contribute to ozone level changes. The p value for the non-seasonal Mann-Kendall test is 0.0075402, which is much closer to 0 than the p value for the seasonal Mann-Kendall test. This shows that there is very little evidence against the null hypothesis that ozone concentration does not change with time, and the results of the test are statistically significant.  
