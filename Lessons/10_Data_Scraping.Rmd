@@ -19,7 +19,7 @@ library(tidyverse)
 library(lubridate)
 library(here); here()
 
-#install.packages("rvest")
+install.packages("rvest")
 library(rvest)
 
 # Set theme
@@ -94,7 +94,10 @@ With this id known, we can extract it's value in a two-step process. First we us
 
 ```{r scrape.some.data}
 the_registrant <- webpage %>% 
+  #take the specific "cell" from the webpage that you're looking for 
+  #here it's the "registrant"
   html_nodes(".table tr:nth-child(1) td:nth-child(2)") %>% 
+  #and pass it through a pipe to get the text associated with that node
   html_text()
 the_registrant
 ```
@@ -119,8 +122,10 @@ Next, we'll extract multiple items from the web page into a list object. Using S
 Below is the code to extract average daily withdrawls. Add your code to extract max daily withdrawals into the `max_withdrawals` variable.
 ```{r scraping.multiple.objects}
 avg_withdrawals <- webpage %>% 
+  #actually allows us to specify ranges of values
   html_nodes('.table:nth-child(7) td:nth-child(7) , .table:nth-child(7) td:nth-child(3)') %>%
   html_text()
+#be careful and take note that numeric values are pulled as characters from the website
 avg_withdrawals
 
 max_withdrawals <- webpage %>% 
@@ -135,12 +140,16 @@ max_withdrawals
 Now that we've scraped the data we want into our coding environment, the next step is to wrangle these data into formats we can work with more easily, i.e. a dataframe. Here, we emply the techniques we've learned earlier in this class to do this and then plot the data. 
 ```{r create.dataframe.from.scrapings}
 #Create a dataframe of withdrawals
+#we didn't scrape the months, so we use the rep() command to make a vector of 1-12
+#we can do the same thing for year using rep() and make a vector of 12 repeats of 2000
+#convert average and max withdrawals to numeric with as.numeric() command
 df_withdrawals <- data.frame("Month" = rep(1:12),
                              "Year" = rep(2000,12),
                              "Avg_Withdrawals_mgd" = as.numeric(avg_withdrawals),
                              "Max_Withdrawals_mgd" = as.numeric(max_withdrawals))
 
 #Modify the dataframe to include the facility name and type as well as the date (as date object)
+#!! aka "bang bang" tells it to refer to the thing as a variable not the string
 df_withdrawals <- df_withdrawals %>% 
   mutate(Registrant = !!the_registrant,
          Facility_name = !!the_facility_name,
@@ -168,9 +177,12 @@ This begins by setting the parameters of the page we'll be scraping to variables
 
 ```{r streamline.the.process}
 #Construct the scraping web address, i.e. its URL
+#we build the scrape URL up by components and then concatenate them together
 the_base_url <- 'https://www.ncwater.org/WUDC/app/WWATR/report/view'
-the_facility <- '0004-0001'
-the_year <- 2015
+the_facility <- '0218-0238'
+the_year <- 2014
+#paste0() eliminates adding a space between the elements that we
+#want to concatenate together!
 the_scrape_url <- paste0(the_base_url, '/', the_facility, '/', the_year)
 print(the_scrape_url)
 
@@ -202,7 +214,7 @@ df_withdrawals <- data.frame("Month" = rep(1:12),
 ggplot(df_withdrawals,aes(x=Date,y=Avg_Withdrawals_mgd)) + 
   geom_line() + 
   geom_smooth(method="loess",se=FALSE) +
-  labs(title = paste("2020 Water usage data for",the_registrant),
+  labs(title = paste(the_year," Water usage data for",the_registrant),
        subtitle = the_facility_name,
        y="Withdrawal (mgd)",
        x="Date")
@@ -267,6 +279,8 @@ the_years = rep(2018:2020)
 my_facility = '0004-0001'
 
 #Use lapply to apply the scrape function
+#repeat the function scrape.it for every value in the array the_years
+#specify the second argument the_facility to the function
 the_dfs <- lapply(X = the_years,
                   FUN = scrape.it,
                   the_facility=my_facility)
@@ -280,11 +294,11 @@ the_df <- bind_rows(the_dfs)
 #Plot, because it's fun and rewarding
 ggplot(the_df,aes(x=Date,y=Avg_Withdrawals_mgd)) + 
   geom_line() + 
-  geom_smooth(method="loess",se=FALSE) +
-  labs(title = paste("2020 Water usage data for",the_registrant),
-       subtitle = the_facility_name,
-       y="Withdrawal (mgd)",
-       x="Date")
+  geom_smooth(method="loess",se=FALSE) #+
+  #labs(title = paste("2020 Water usage data for",the_registrant),
+       #subtitle = the_facility_name,
+       #y="Withdrawal (mgd)",
+       #x="Date")
 ```
 
 # Part 3. Web Crawling
