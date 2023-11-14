@@ -2,6 +2,8 @@
 title: "10: Lab - Data Scraping"
 author: "Environmental Data Analytics | John Fay"
 date: "Fall 2023"
+editor_options: 
+  chunk_output_type: console
 ---
 
 ## Objectives
@@ -17,10 +19,10 @@ library(tidyverse);library(lubridate);library(viridis);library(here)
 #install.packages("rvest")
 library(rvest)
 
-#install.packages("dataRetrieval")
+install.packages("dataRetrieval")
 library(dataRetrieval)
 
-#install.packages("tidycensus")
+install.packages("tidycensus")
 library(tidycensus)
 
 # Set theme
@@ -100,6 +102,26 @@ ggplot(gage_data,aes(x=datetime,y=discharge_cfs)) +
 
 ```{r EXERCISE - pull.and.plot.other.discharge.data}
 
+#Set the URL
+#rdb stands for relational database. we're going to keep that as is.
+theURLnew <- 'https://waterdata.usgs.gov/nwis/uv?search_site_no=02085070&period=24&format=rdb'
+
+#Get the data, which starts on line 30
+gage_data <- read.table(theURLnew,skip = 30,header=TRUE,sep='\t',stringsAsFactors = T) 
+
+#Update the column headers
+colnames(gage_data) = c("agency_cd", "site_no", "datetime", "tz_cd",
+                        "discharge_cfs", "89192_00060_cd", "gage_ht_ft", "89193_00065_cd")
+#Tidy the data
+gage_data <- gage_data %>% 
+  select(datetime, discharge_cfs,gage_ht_ft) %>% 
+  mutate(datetime = ymd_hm(datetime))
+
+#Plot
+ggplot(gage_data,aes(x=datetime,y=discharge_cfs)) + 
+  geom_line() +
+  labs(x = "Date",y = "Discharge (cfs)")
+
 ```
 
 
@@ -162,7 +184,7 @@ You'll also need to look up the IDs of the variables you want to extract. Those 
 
 ```{r}
 #Apply the API key
-#census_api_key("d4ad7874c996c7a83fec0a81466309ddc07d8e22a", install = TRUE)
+census_api_key("d4ad7874c996c7a83fec0a81466309ddc07d8e22a", install = TRUE)
 
 nc_pop <- 
   get_acs(geography = "county",
@@ -201,16 +223,30 @@ The RVest scraping workflow is as follows:
 
 ```{r EXERCISE - scrape.data.manually eval=FALSE}
 #1 Link to the web site using read_html
-the_website <- 
+the_website <- read_html('https://www.eia.gov/electricity/state/')
 
 #2&3 Locate elements and read their text attributes into variables
-the_states <- 
-the_price <- 
-the_capacity <- 
-net_generation <- 
-total_retail <- 
+the_states_tag <- 'tr :nth-child(1)'
+the_price_tag <- 'tr :nth-child(2)'
+the_capacity_tag <- 'tr :nth-child(3)'
+net_generation_tag <- 'tr :nth-child(4)'
+total_retail_tag <- 'tr :nth-child(5)'
   
 #3 Construct a dataframe from the values
+the_states <- the_website %>% html_nodes(the_states_tag) %>% html_text()
+the_price <- the_website %>%   html_nodes(the_price_tag) %>%  html_text()
+the_capacity <- the_website %>% html_nodes(the_capacity_tag) %>% html_text()
+net_generation <- the_website %>% html_nodes(net_generation_tag) %>% html_text()
+total_retail <- the_website %>% html_nodes(total_retail_tag) %>% html_text()
+
+df_state_electricity <- data.frame(
+  'state' = the_states,
+  'price' = the_price,
+  #find the way to do this in the powerpoint slides
+  'capacity' = as.numeric(gsub(',' , '', 'the_capacity,
+  'net generation' = net_generation,
+  'total retail' = total_retail)
+
 
 ```
 
@@ -240,5 +276,6 @@ scrape.it <- function(the_year){
 # Use the above function to scrape data for 2017
 
 # Map the function to scrape data from 2017 to 2019
+df_years <- lapply(seq(2017,2022), scrape.it)
 
 ```
