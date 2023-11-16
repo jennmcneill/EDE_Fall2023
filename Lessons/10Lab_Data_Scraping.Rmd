@@ -243,7 +243,7 @@ df_state_electricity <- data.frame(
   'state' = the_states,
   'price' = the_price,
   #find the way to do this in the powerpoint slides
-  'capacity' = as.numeric(gsub(',' , '', 'the_capacity,
+  'capacity' = as.numeric(gsub(',','','the_capacity,
   'net generation' = net_generation,
   'total retail' = total_retail)
 
